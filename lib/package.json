@@ -1,0 +1,41 @@
+{
+  "name": "paytm-blink-checkout-react",
+  "version": "0.0.0-alpha.0",
+  "description": "React based implementation for Paytm Blink Checkout JS",
+  "main": "build/commonjs/index.js",
+  "unpkg": "build/umd/react-checkout.js",
+  "files": [
+    "build/commonjs"
+  ],
+  "scripts": {
+    "build-umd": "webpack --config ./config/webpack.config.umd.js",
+    "build-common": "webpack --config ./config/webpack.config.commonjs.js",
+    "build-all": "rm -rf ./build && npm run build-common && npm run build-umd",
+    "package": "npm run build-all && npm pack"
+  },
+  "keywords": [
+    "Paytm",
+    "Blink Checkout JS",
+    "Checkout JS",
+    "Paytm Blink Checkout React",
+    "paytm-blink-checkout-react"
+  ],
+  "author": "Ankit Gupta",
+  "license": "ISC",
+  "peerDependencies": {
+    "react": "^16.3.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.8.4",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/preset-env": "^7.8.4",
+    "@babel/preset-react": "^7.8.3",
+    "babel-loader": "^8.0.6",
+    "clean-webpack-plugin": "^3.0.0",
+    "npm-pack": "^1.0.0",
+    "react": "^16.12.0",
+    "webpack": "^4.41.6",
+    "webpack-cli": "^3.3.11",
+    "webpack-merge": "^4.2.2"
+  }
+}
