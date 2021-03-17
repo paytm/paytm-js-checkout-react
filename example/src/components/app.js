@@ -3,7 +3,7 @@ import CONFIG from '../../mocks/merchant-config';
 import { CheckoutProvider, Checkout } from 'paytm-blink-checkout-react';
 import InjectedCheckout from './injected-checkout';
 
-const SSR_SIMULATE = 'SSR Simulate : ';
+const USE_EXISTING_CHECKOUT_INSTANCE = 'Use existing checkout instance : ';
 
 class App extends Component {
   textAreaRef = React.createRef();
@@ -85,11 +85,11 @@ class App extends Component {
         });
       }
       else {
-        console.error(SSR_SIMULATE + 'onload not available!');
+        console.error(USE_EXISTING_CHECKOUT_INSTANCE + 'onload not available!');
       }
     };
     scriptElement.onerror = error => {
-      console.error('SSR Simulate: script load fail!');
+      console.error(USE_EXISTING_CHECKOUT_INSTANCE + 'script load fail!');
     }
     document.body.appendChild(scriptElement);
     this.setState({ isScriptLoading: true });
@@ -100,7 +100,7 @@ class App extends Component {
       return window.Paytm.CheckoutJS;
     }
     else {
-      console.error(SSR_SIMULATE + 'Checkout instance not found!');
+      console.error(USE_EXISTING_CHECKOUT_INSTANCE + 'Checkout instance not found!');
     }
 
     return null;
@@ -127,7 +127,7 @@ class App extends Component {
           </button>
           <button type="button"
             onClick={this.loadCheckoutScript}>
-            SSR simulate
+            Use existing checkout instance
           </button>
           <input type="checkbox" onClick={this.toggleOpenInPopup}
             defaultChecked={openInPopup}>
@@ -138,7 +138,8 @@ class App extends Component {
         <div><b>CHECKOUT VISIBILITY :</b> {showCheckout.toString()}</div>
         <CheckoutProvider config={this.state.config}
           checkoutJsInstance={this.state.checkoutJsInstance}
-          openInPopup={openInPopup}>
+          openInPopup={openInPopup} 
+          env="STAGE">
           <InjectedCheckout />
           {showCheckout && <Checkout />}
         </CheckoutProvider>

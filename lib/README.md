@@ -19,13 +19,16 @@ import { CheckoutProvider, Checkout, injectCheckout} from 'paytm-blink-checkout-
 The component are as follows : 
 
 ### CheckoutProvider
-The component is responsible for setting up Paytm Blink Checkout JS in the project. It sets the Paytm Blink Checkout JS instance and make it available to all its children component via React Context Provider.  It requires **config** property which is mandatory is order to initialize Paytm Blink Checkout JS library. Additionally openInPopup prop can also be passed to show checkout in popup or not, by default it's value is true.
+The component is responsible for setting up Paytm Blink Checkout JS in the project. It sets the Paytm Blink Checkout JS instance and make it available to all its children component via React Context Provider.  It requires **config** property which is mandatory is order to initialize Paytm Blink Checkout JS library. Additionally following props(optional) can be passed: 
+1. openInPopup: To show checkout in popup or not, by default it's value is true.
+2. env: To load Paytm Blink Checkout JS from 'STAGE' or 'PROD' env, by default it's value is 'PROD'.
+3. checkoutJsInstance: To use existing checkoutjs instance.
 
 The  config should be of same format as the  Paytm Blink Checkout JS library, which could be checked from this [link](https://staticpg.paytm.in/checkoutjs/21/docs/#/configuration).
 
 #### Example
 ```javascript
-<CheckoutProvider config={config} openInPopup="false">
+<CheckoutProvider config={config} openInPopup="false" env='PROD'>
 </CheckoutProvider>
 ```
 

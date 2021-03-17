@@ -1,6 +1,6 @@
 {
   "name": "paytm-blink-checkout-react",
-  "version": "0.0.0-alpha.0",
+  "version": "0.0.2",
   "description": "React based implementation for Paytm Blink Checkout JS",
   "main": "build/commonjs/index.js",
   "unpkg": "build/umd/react-checkout.js",
