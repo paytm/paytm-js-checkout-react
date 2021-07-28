@@ -92,7 +92,6 @@ class App extends Component {
       console.error(USE_EXISTING_CHECKOUT_INSTANCE + 'script load fail!');
     }
     document.body.appendChild(scriptElement);
-    this.setState({ isScriptLoading: true });
   }
 
   getCheckoutJsObj() {
