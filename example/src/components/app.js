@@ -1,51 +1,48 @@
-import React, { Component } from 'react';
+import React, { Component , useRef, useState} from 'react';
 import CONFIG from '../../mocks/merchant-config';
 import { CheckoutProvider, Checkout } from 'paytm-blink-checkout-react';
 import InjectedCheckout from './injected-checkout';
 
 const USE_EXISTING_CHECKOUT_INSTANCE = 'Use existing checkout instance : ';
 
-class App extends Component {
-  textAreaRef = React.createRef();
+const appendHandler = (config) => {
+  const newConfig = { ...config };
+  newConfig.handler = {
+    notifyMerchant: notifyMerchantHandler
+  }
+  return newConfig;
+}
 
-  constructor(props) {
-    super(props);
+const notifyMerchantHandler = (eventType, data) => {
+  console.log('MERCHANT NOTIFY LOG', eventType, data);
+}
 
-    this.state = {
-      config: this.appendHandler(CONFIG),
-      showCheckout: false,
-      openInPopup: true,
-      checkoutJsInstance: null
-    };
+function App() {
+
+  const [mConfig, setMConfig] = useState(appendHandler(CONFIG))
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [openInPopup, setOpenInPopup] = useState(true);
+  const [checkoutJsInstance, setCheckoutJsInstance] = useState(null);
+
+  const mConfigTextAreaRef = useRef();
+  const mConfigTextAreaVal = JSON.stringify(mConfig, null, 4);
+
+  
+  // notifyMerchantHandler = (eventType, data) => {
+  //   console.log('MERCHANT NOTIFY LOG', eventType, data);
+  // }
+
+  const renderUpdateConfig = () => {
+    setMConfig(getUpdatedMerchantConfig());
   }
 
-  appendHandler(config) {
-    const newConfig = { ...config };
+  const getUpdatedMerchantConfig= () => {
+    const config = parse(mConfigTextAreaRef.current.value);
 
-    newConfig.handler = {
-      notifyMerchant: this.notifyMerchantHandler
-    }
-
-    return newConfig;
+    return appendHandler(config);
   }
 
-  notifyMerchantHandler = (eventType, data) => {
-    console.log('MERCHANT NOTIFY LOG', eventType, data);
-  }
-
-  renderUpdateConfig = () => {
-    this.setState({
-      config: this.getUpdatedConfig()
-    });
-  }
-
-  getUpdatedConfig() {
-    const config = this.parse(this.textAreaRef.current.value);
-
-    return this.appendHandler(config);
-  }
-
-  parse(value) {
+  const parse = (value) => {
     try {
       return JSON.parse(value)
     }
@@ -55,33 +52,26 @@ class App extends Component {
     }
   }
 
-  toggleOpenInPopup = () => {
-    this.setState((prevState, _) => ({
-      openInPopup: !prevState.openInPopup
-    }));
+  const toggleOpenInPopup = () => {
+    setOpenInPopup(!openInPopup);
+  }
+  const toggleCheckout = () => {
+    setShowCheckout(!showCheckout);
   }
 
-  toggleCheckout = () => {
-    this.setState((prevState, _) => ({
-      showCheckout: !prevState.showCheckout
-    }));
-  }
-
-  loadCheckoutScript = () => {
-    const url = 'https://pgp-hotfix.paytm.in/merchantpgpui/checkoutjs/merchants/';
+  const loadCheckoutScript = () => {
+    const url = 'https://securegw.paytm.in/merchantpgpui/checkoutjs/merchants/';
     const scriptElement = document.createElement('script');
     scriptElement.async = true;
-    scriptElement.src = url.concat(CONFIG.merchant.mid);
+    scriptElement.src = url.concat(mConfig.merchant.mid);
     scriptElement.type = 'application/javascript';
     scriptElement.onload = () => {
-      const checkoutJsInstance = this.getCheckoutJsObj();
+      const checkoutJsInstance = getCheckoutJsObj();
 
       if (checkoutJsInstance && checkoutJsInstance.onLoad) {
         checkoutJsInstance.onLoad(() => {
-          this.setState({
-            config: this.getUpdatedConfig(),
-            checkoutJsInstance
-          });
+          setMConfig(getUpdatedMerchantConfig());
+          setCheckoutJsInstance(checkoutJsInstance);
         });
       }
       else {
@@ -94,7 +84,7 @@ class App extends Component {
     document.body.appendChild(scriptElement);
   }
 
-  getCheckoutJsObj() {
+  const getCheckoutJsObj = () => {
     if (window && window.Paytm && window.Paytm.CheckoutJS) {
       return window.Paytm.CheckoutJS;
     }
@@ -105,38 +95,36 @@ class App extends Component {
     return null;
   }
 
-  render() {
-    const { showCheckout, openInPopup, config } = this.state;
-    const textAreaVal = JSON.stringify(config, null, 4);
+   
 
     return (
       <div>
         <textarea cols="50"
           rows="25"
-          defaultValue={textAreaVal}
-          ref={this.textAreaRef} />
+          defaultValue={mConfigTextAreaVal}
+          ref={mConfigTextAreaRef} />
         <div>
           <button type="button"
-            onClick={this.toggleCheckout}>
+            onClick={toggleCheckout}>
             Toggle Checkout Screen
           </button>
           <button type="button"
-            onClick={this.renderUpdateConfig}>
+            onClick={renderUpdateConfig}>
             Re-render updated config
           </button>
           <button type="button"
-            onClick={this.loadCheckoutScript}>
+            onClick={loadCheckoutScript}>
             Use existing checkout instance
           </button>
-          <input type="checkbox" onClick={this.toggleOpenInPopup}
+          <input type="checkbox" onClick={toggleOpenInPopup}
             defaultChecked={openInPopup}>
           </input> Open in popup
         </div>
         <br />
 
         <div><b>CHECKOUT VISIBILITY :</b> {showCheckout.toString()}</div>
-        <CheckoutProvider config={this.state.config}
-          checkoutJsInstance={this.state.checkoutJsInstance}
+        <CheckoutProvider config={mConfig}
+          checkoutJsInstance={checkoutJsInstance}
           openInPopup={openInPopup} 
           env="STAGE">
           <InjectedCheckout />
@@ -144,7 +132,7 @@ class App extends Component {
         </CheckoutProvider>
       </div>
     );
-  }
+  
 }
 
 export default App;
